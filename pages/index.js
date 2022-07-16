@@ -1,9 +1,8 @@
 import Head from 'next/head';
-import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuthState, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { auth, db } from '../firebase';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import {
   addDoc,
   collection,
@@ -24,6 +23,9 @@ export default function Home() {
   const q = query(chatRef, orderBy('timestamp', 'desc'), limit(7));
   const [chatValues, chatLoading, chatError, chatSnapshot] =
     useCollectionData(q);
+  useEffect(() => {
+    chatValues.reverse();
+  }, [chatValues]);
   const scrollDown = () => {
     viewRef.current.scrollIntoView({
       behavior: 'smooth',
@@ -78,7 +80,7 @@ export default function Home() {
         )}
         <div className="relative">
           {user ? (
-            chatValues?.reverse().map((item) => {
+            chatValues?.map((item) => {
               return (
                 <div className="relative mt-5 mb-2" key={item.timestamp}>
                   {item.uid === user?.uid ? (
